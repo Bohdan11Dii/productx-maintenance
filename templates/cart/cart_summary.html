@@ -1,0 +1,156 @@
+{% extends "index.html" %}
+
+
+{% block header %}
+    <h1>Товари в кошику</h1>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+  {% if cart_products %}
+    {% for product in cart_products %}
+            <div class="row badget">
+                <div class="col-md-6">
+                    <div id="slider" class="owl-carousel product-slider">
+                        <div class="item">
+                            <img class="" style="max-width: 300px;
+                            width: 100%;
+                            image-rendering: -webkit-optimize-contrast;" src="{{ product.image.url }}" />
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="col-md-6 badget_info">
+                    <div class="product-dtl">
+                        <a type="button" data-index="{{product.id}}" class="delete-product"><i class="bi bi-x-circle-fill"></i></a>
+                        <div class="product-info">
+                            <br>
+                            <div class="product-name">Назва: {{ product.name }}</div>
+                            <div class="product-name">Каталог: {{ product.category }}</div>
+                            <div class="product-price-discount"><span>Ціна: <strong>{{ product.price }} грн</strong></span></div>
+                            
+                        </div>
+                        <div class="row justify-content-end">
+							<div class="col-md-2">Кількість:</div>
+
+							<div class="col-md-2">
+								<select name="" id="select{{product.id}}" class="form-select form-select-sm" >
+                                        {% for key, value in quantities.items %}
+                                            {% if key == product.id|slugify %}
+                                            <option selected>{{ value }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% for item in product.is_str %}
+                                        <option value="item">{{item}}</option>
+                                        
+                                        {% endfor %}
+								</select>
+							</div>
+						</div>
+                        <div style="display: flex;
+                            justify-content: space-around;
+                            flex-wrap: wrap;">
+                        
+                            <div class="product-count" style="
+                                                                display: flex;
+                                                                flex-wrap: wrap;
+                                                                align-items: baseline;
+                                                                justify-content: center
+                            
+                            ">
+                            </div>
+                            
+                        </div>
+                        <a class="btn btn-secondary" href="{% url 'catalog:category-detail' product.id %}">
+                            Назад
+                        </a>
+                        <button type="button" data-index="{{product.id}}" class="btn btn-secondary update-cart">Оновити кількість</button>
+                        
+                    </div>
+                </div>
+            </div>
+  {% endfor %}
+<div class="row">
+    <div class="total-container">
+        <div>
+            
+          </div>
+          <div style="text-align: center;" class="total">
+            <h1 ><strong>Разом: {{ totals }}</strong></h1>
+            <a href="{% url 'catalog:order-create' %}">
+                <button class="btn btn-primary">Оформити замовлення</button>
+            </a>
+          </div>
+    </div>
+</div>
+
+  {% else %}
+  <p style="text-align: center; font-size: 24px;"><strong>Кошик порожній</strong></p>
+  {% endif %}
+</div>
+
+<script>
+$(document).on('click', '.update-cart', function(e){
+    e.preventDefault();
+    // grab the product id
+    var productid = $(this).data('index');
+
+    $.ajax({
+    type: 'POST',
+    url: '{% url "cart:cart_update" %}',
+    data: {
+      product_id: $(this).data('index'),
+      product_qty: $('#select' + productid + ' option:selected').text(),
+      csrfmiddlewaretoken: '{{ csrf_token }}',
+      action: 'post'
+    },
+    success: function(json){
+        //console.log(json)
+        //document.getElementById("cart_quantity").textContent = json.qty
+        location.reload();
+    },
+
+    error: function(xhr, errmsg, err){
+
+    }
+
+
+    });
+
+})
+
+$(document).on('click', '.delete-product', function(e){
+    e.preventDefault();
+    // grab the product id
+    //var productid = $(this).data('index');
+
+    $.ajax({
+    type: 'POST',
+    url: '{% url "cart:cart_delete" %}',
+    data: {
+      product_id: $(this).data('index'),
+      csrfmiddlewaretoken: '{{ csrf_token }}',
+      action: 'post'
+    },
+    success: function(json){
+        //console.log(json)
+        //document.getElementById("cart_quantity").textContent = json.qty
+        location.reload();
+    },
+
+    error: function(xhr, errmsg, err){
+
+    }
+
+
+    });
+
+})
+
+</script>
+
+{% endblock %}

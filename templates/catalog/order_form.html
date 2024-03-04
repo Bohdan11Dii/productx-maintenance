@@ -1,0 +1,33 @@
+{% extends 'index.html' %}
+
+{% load crispy_forms_filters %}
+
+{% block header %}
+
+{% endblock %}
+{% block content %}
+
+
+
+   <div class="wrapper">
+  <div class="login_box">
+    <div class="login-header">
+      <span>Замовлення</span>
+    </div>
+    <form action="" method="post" novalidate>
+        {% csrf_token %}
+        {{form|crispy}}
+
+        <div class="input_box">
+            <input type="submit" class="input-submit" value="Замовити">
+        </div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+    
+</script>
+  
+{% endblock %}
